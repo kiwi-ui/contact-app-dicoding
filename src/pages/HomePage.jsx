@@ -1,8 +1,8 @@
 import React from 'react';
 import ContactList from '../components/ContactList';
-import { deleteContact, getContacts } from '../utils/data';
 import SearchBar from '../components/SearchBar';
 import { useSearchParams } from 'react-router-dom';
+import { deleteContact, getContacts } from '../utils/api';
 
 const HomePageWrapper = () => {
   const [searhParams, setSearchParams] = useSearchParams();
@@ -18,21 +18,31 @@ class HomePage extends React.Component {
     super(props);
  
     this.state = {
-      contacts: getContacts(),
+      contacts: [],
       keyword: props.defaultKeyword || '',
     }
  
     this.onDeleteHandler = this.onDeleteHandler.bind(this);
     this.onKeywordChangeHandler = this.onKeywordChangeHandler.bind(this);
   }
+
+  async componentDidMount() {
+    const { data } = await getContacts();
  
-  onDeleteHandler(id) {
-    deleteContact(id);
- 
-    // update the contact state from data.js
     this.setState(() => {
       return {
-        contacts: getContacts(),
+        contacts: data,
+      }
+    });
+  }
+ 
+  async onDeleteHandler(id) {
+    deleteContact(id);
+ 
+    const { data } = await getContacts();
+    this.setState(() => {
+      return {
+        contacts: data,
       }
     });
   }
@@ -61,5 +71,5 @@ class HomePage extends React.Component {
     )
   }
 }
- 
+
 export default HomePageWrapper;
